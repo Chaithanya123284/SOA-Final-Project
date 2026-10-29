@@ -1,0 +1,38 @@
+name: CareerLink Microservices CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Package Microservices
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Eclipse Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compile and Run Unit & Integration Tests
+        working-directory: backend
+        run: mvn clean test --batch-mode
+
+      - name: Package Microservices JARs
+        working-directory: backend
+        run: mvn package -DskipTests --batch-mode
+
+      - name: Archive Surefire Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: 'backend/**/target/surefire-reports/'

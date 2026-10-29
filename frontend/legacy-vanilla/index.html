@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerLink Networks | Enterprise Talent Acquisition & Job Application Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Top Microservices Health Bar -->
+    <header class="top-status-bar">
+        <div class="container status-content">
+            <div class="service-badges">
+                <span class="status-label"><i class="fa-solid fa-server"></i> Microservices Mesh:</span>
+                <span class="badge badge-success"><i class="fa-solid fa-circle-nodes"></i> Eureka (8761)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-network-wired"></i> Gateway (8080)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-shield-halved"></i> Auth (8081)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-id-card"></i> Profile (8082)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-briefcase"></i> Job (8083)</span>
+                <span class="badge badge-success"><i class="fa-solid fa-file-invoice"></i> Application (8084)</span>
+            </div>
+            <div class="docs-links">
+                <a href="http://localhost:8761" target="_blank" class="link-doc"><i class="fa-solid fa-gauge-high"></i> Eureka Dashboard</a>
+                <a href="#swagger-section" class="link-doc"><i class="fa-solid fa-book-open"></i> API Docs</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-link"></i></div>
+                <div class="logo-text">
+                    <span class="brand-title">CareerLink</span>
+                    <span class="brand-sub">Talent Cloud Platform</span>
+                </div>
+            </div>
+
+            <!-- Role Selector & Navigation Tabs -->
+            <div class="nav-tabs" id="navTabs">
+                <button class="nav-tab active" data-tab="jobs-tab"><i class="fa-solid fa-magnifying-glass"></i> Explore Jobs</button>
+                <button class="nav-tab candidate-only" data-tab="applications-tab"><i class="fa-solid fa-file-lines"></i> My Applications</button>
+                <button class="nav-tab candidate-only" data-tab="profile-tab"><i class="fa-solid fa-user-tie"></i> My Profile</button>
+                <button class="nav-tab recruiter-only hidden" data-tab="recruiter-jobs-tab"><i class="fa-solid fa-list-check"></i> Manage Postings</button>
+                <button class="nav-tab recruiter-only hidden" data-tab="recruiter-applicants-tab"><i class="fa-solid fa-users"></i> Review Applicants</button>
+            </div>
+
+            <!-- Auth Control Box -->
+            <div class="auth-box">
+                <div id="unauthenticatedView" class="auth-buttons">
+                    <!-- Quick Demo Switcher Buttons -->
+                    <div class="demo-buttons">
+                        <button class="btn btn-sm btn-outline" id="quickCandidateLogin"><i class="fa-solid fa-user"></i> Demo Candidate</button>
+                        <button class="btn btn-sm btn-outline" id="quickRecruiterLogin"><i class="fa-solid fa-building"></i> Demo Recruiter</button>
+                    </div>
+                    <button class="btn btn-primary" id="openLoginModalBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Register</button>
+                </div>
+                <div id="authenticatedView" class="user-profile-badge hidden">
+                    <div class="user-avatar" id="navUserAvatar">A</div>
+                    <div class="user-details">
+                        <span class="user-name" id="navUserName">Alex Morgan</span>
+                        <span class="user-role-chip" id="navUserRole">ROLE_CANDIDATE</span>
+                    </div>
+                    <button class="btn-icon" id="logoutBtn" title="Log out"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Body Container -->
+    <main class="container main-content">
+
+        <!-- TAB 1: Explore Jobs (Public & Candidate) -->
+        <section id="jobs-tab" class="tab-pane active">
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <h1>Accelerate Your Career with <span class="highlight">Top Employers</span></h1>
+                    <p>Discover high-impact engineering, cloud, and product opportunities across leading tech networks.</p>
+                    
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <div class="search-field">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="jobSearchInput" placeholder="Job title, keywords, or company...">
+                        </div>
+                        <div class="search-field">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <input type="text" id="jobLocationInput" placeholder="City or 'Remote'">
+                        </div>
+                        <div class="search-field select-field">
+                            <i class="fa-solid fa-clock"></i>
+                            <select id="employmentTypeSelect">
+                                <option value="">All Employment Types</option>
+                                <option value="FULL_TIME">Full Time</option>
+                                <option value="REMOTE">Remote</option>
+                                <option value="CONTRACT">Contract</option>
+                                <option value="INTERNSHIP">Internship</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="searchJobsBtn"><i class="fa-solid fa-filter"></i> Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Listings Section -->
+            <div class="jobs-layout">
+                <div class="jobs-header">
+                    <h2>Available Positions <span class="badge badge-count" id="jobsCountBadge">0</span></h2>
+                    <div class="filters-info" id="activeFilterTags"></div>
+                </div>
+                <div class="job-cards-grid" id="jobCardsContainer">
+                    <!-- Dynamic Job Cards Injected Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Candidate My Applications -->
+        <section id="applications-tab" class="tab-pane hidden">
+            <div class="section-header">
+                <div>
+                    <h2>My Application Tracker</h2>
+                    <p class="section-subtitle">Real-time status tracking and recruiter feedback for your submissions.</p>
+                </div>
+                <button class="btn btn-outline btn-sm" id="refreshApplicationsBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+
+            <div class="applications-tracker-table">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Job Title & Company</th>
+                                <th>Applied Date</th>
+                                <th>Current Status</th>
+                                <th>Recruiter Feedback / Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                            <!-- Dynamic Application Rows Injected Here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Candidate Profile -->
+        <section id="profile-tab" class="tab-pane hidden">
+            <div class="section-header">
+                <div>
+                    <h2>Candidate Profile & Resume</h2>
+                    <p class="section-subtitle">Keep your professional skills and credentials up-to-date for recruiters.</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="saveProfileBtn"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+            </div>
+
+            <div class="profile-editor-card">
+                <form id="profileForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="profileFullName" placeholder="e.g. Alex Morgan">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="profileEmail" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="profilePhone" placeholder="e.g. +1-555-0100">
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="profileLocation" placeholder="e.g. San Francisco, CA">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Professional Headline</label>
+                            <input type="text" id="profileHeadline" placeholder="e.g. Senior Java & Spring Cloud Microservices Engineer">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Skills (Comma-separated)</label>
+                            <input type="text" id="profileSkills" placeholder="Java, Spring Boot, Spring Cloud, Docker, Kafka, Kubernetes">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Professional Summary</label>
+                            <textarea id="profileSummary" rows="3" placeholder="Brief overview of your experience..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Years of Experience</label>
+                            <input type="number" id="profileYearsExp" placeholder="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Resume Link (Cloud/PDF)</label>
+                            <input type="text" id="profileResumeUrl" placeholder="https://s3.amazonaws.com/resumes/my_resume.pdf">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <input type="text" id="profileLinkedin" placeholder="https://linkedin.com/in/alexmorgan">
+                        </div>
+                        <div class="form-group">
+                            <label>GitHub URL</label>
+                            <input type="text" id="profileGithub" placeholder="https://github.com/alexmorgan">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 4: Recruiter Postings -->
+        <section id="recruiter-jobs-tab" class="tab-pane hidden">
+            <div class="section-header">
+                <div>
+                    <h2>Manage Job Postings</h2>
+                    <p class="section-subtitle">Create, monitor, and update job requisitions for your organization.</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="openCreateJobModalBtn"><i class="fa-solid fa-plus"></i> Post New Job</button>
+            </div>
+
+            <div class="recruiter-jobs-grid" id="recruiterJobsContainer">
+                <!-- Dynamic Recruiter Job Cards Injected Here -->
+            </div>
+        </section>
+
+        <!-- TAB 5: Recruiter Review Applicants -->
+        <section id="recruiter-applicants-tab" class="tab-pane hidden">
+            <div class="section-header">
+                <div>
+                    <h2>Applicant Review & Workflow Tracking</h2>
+                    <p class="section-subtitle">Review candidate resumes, transition statuses, and leave interview notes.</p>
+                </div>
+                <div class="recruiter-filter-bar">
+                    <select id="recruiterJobFilterSelect">
+                        <option value="ALL">Select Job Opening...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="applicants-grid" id="recruiterApplicantsContainer">
+                <!-- Dynamic Applicant Cards Injected Here -->
+            </div>
+        </section>
+
+        <!-- SWAGGER / API DOCS SECTION -->
+        <section id="swagger-section" class="swagger-reference-card">
+            <div class="swagger-header">
+                <div class="swagger-icon"><i class="fa-solid fa-code"></i></div>
+                <div>
+                    <h3>Interactive API Documentation & Microservice Endpoints</h3>
+                    <p>Access OpenAPI 3 / Swagger documentation and H2 database consoles directly.</p>
+                </div>
+            </div>
+            <div class="swagger-links-grid">
+                <a href="http://localhost:8081/swagger-ui.html" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Auth Service</span>
+                    <span class="pill-port">8081/swagger-ui.html</span>
+                </a>
+                <a href="http://localhost:8082/swagger-ui.html" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Profile Service</span>
+                    <span class="pill-port">8082/swagger-ui.html</span>
+                </a>
+                <a href="http://localhost:8083/swagger-ui.html" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Job Service</span>
+                    <span class="pill-port">8083/swagger-ui.html</span>
+                </a>
+                <a href="http://localhost:8084/swagger-ui.html" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Application Service</span>
+                    <span class="pill-port">8084/swagger-ui.html</span>
+                </a>
+                <a href="http://localhost:8761" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Eureka Service Discovery</span>
+                    <span class="pill-port">8761 (Dashboard)</span>
+                </a>
+                <a href="http://localhost:5050" target="_blank" class="swagger-pill" style="border-color:#336791;">
+                    <span class="pill-name"><i class="fa-solid fa-database"></i> pgAdmin 4 (PostgreSQL)</span>
+                    <span class="pill-port">Port 5050 (admin@careerlink.com)</span>
+                </a>
+                <a href="http://localhost:8085" target="_blank" class="swagger-pill" style="border-color:#13aa52;">
+                    <span class="pill-name"><i class="fa-solid fa-leaf"></i> Mongo Express (MongoDB)</span>
+                    <span class="pill-port">Port 8085 (profiledb)</span>
+                </a>
+                <a href="http://localhost:8080/actuator/gateway/routes" target="_blank" class="swagger-pill">
+                    <span class="pill-name">Gateway Load Balanced Routes</span>
+                    <span class="pill-port">8080/actuator</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: Authentication (Login / Register) -->
+    <div class="modal-backdrop hidden" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="authModalTitle">Welcome to CareerLink</h3>
+                <button class="modal-close" id="closeAuthModalBtn">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="showLoginTabBtn">Sign In</button>
+                <button class="modal-tab" id="showRegisterTabBtn">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="modal-body">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="candidate@careerlink.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Password123!" required>
+                </div>
+                <div class="form-hint">
+                    <p><i class="fa-solid fa-circle-info"></i> Demo accounts available: <strong>candidate@careerlink.com</strong> or <strong>recruiter@careerlink.com</strong> (Password: <code>Password123!</code>)</p>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In with JWT</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="modal-body hidden">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regFullName" placeholder="e.g. Jordan Smith" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="e.g. jordan@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="At least 6 characters" required>
+                </div>
+                <div class="form-group">
+                    <label>I want to:</label>
+                    <select id="regRole" required>
+                        <option value="CANDIDATE">Find a Job (Candidate)</option>
+                        <option value="RECRUITER">Post Jobs & Hire (Recruiter)</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="companyNameGroup">
+                    <label>Company Name</label>
+                    <input type="text" id="regCompany" placeholder="e.g. Acme Tech Solutions">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Apply for Job Modal -->
+    <div class="modal-backdrop hidden" id="applyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="applyModalJobTitle">Apply for Position</h3>
+                    <p class="modal-subtitle" id="applyModalCompany">Company Name</p>
+                </div>
+                <button class="modal-close" id="closeApplyModalBtn">&times;</button>
+            </div>
+            <form id="applyForm" class="modal-body">
+                <input type="hidden" id="applyJobId">
+                <div class="form-group">
+                    <label>Applicant Name</label>
+                    <input type="text" id="applyCandidateName" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Applicant Email</label>
+                    <input type="email" id="applyCandidateEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Resume Link / File URL</label>
+                    <input type="text" id="applyResumeUrl" placeholder="https://example.com/resume.pdf">
+                </div>
+                <div class="form-group">
+                    <label>Cover Letter / Why You're a Fit</label>
+                    <textarea id="applyCoverLetter" rows="4" placeholder="Briefly highlight your relevant experience..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="submitApplyBtn"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Create Job Modal (Recruiter) -->
+    <div class="modal-backdrop hidden" id="createJobModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3>Post a New Job Opening</h3>
+                <button class="modal-close" id="closeCreateJobModalBtn">&times;</button>
+            </div>
+            <form id="createJobForm" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Job Title *</label>
+                        <input type="text" id="newJobTitle" placeholder="e.g. Senior Cloud Architect" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Company Name *</label>
+                        <input type="text" id="newJobCompany" placeholder="e.g. TechCorp Global" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" id="newJobLocation" placeholder="e.g. Remote or Austin, TX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Employment Type *</label>
+                        <select id="newJobType" required>
+                            <option value="FULL_TIME">Full Time</option>
+                            <option value="REMOTE">Remote</option>
+                            <option value="CONTRACT">Contract</option>
+                            <option value="INTERNSHIP">Internship</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Min Salary (USD/yr)</label>
+                        <input type="number" id="newJobMinSalary" placeholder="120000">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Salary (USD/yr)</label>
+                        <input type="number" id="newJobMaxSalary" placeholder="160000">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Required Skills (Comma-separated) *</label>
+                        <input type="text" id="newJobSkills" placeholder="Java, Spring Boot, Docker, Kubernetes" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Job Description *</label>
+                        <textarea id="newJobDescription" rows="4" placeholder="Describe the role and responsibilities..." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Requirements & Qualifications</label>
+                        <textarea id="newJobRequirements" rows="3" placeholder="Key qualifications and required experience..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-cloud-arrow-up"></i> Publish Job Listing</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Recruiter Status Update & Review Modal -->
+    <div class="modal-backdrop hidden" id="reviewModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="reviewCandidateName">Candidate Application</h3>
+                    <p class="modal-subtitle" id="reviewJobTitle">Job Title</p>
+                </div>
+                <button class="modal-close" id="closeReviewModalBtn">&times;</button>
+            </div>
+            <form id="reviewForm" class="modal-body">
+                <input type="hidden" id="reviewApplicationId">
+                <div class="form-group">
+                    <label>Cover Letter</label>
+                    <div class="read-box" id="reviewCoverLetter"></div>
+                </div>
+                <div class="form-group">
+                    <label>Resume Link</label>
+                    <div id="reviewResumeLinkBox"></div>
+                </div>
+                <div class="form-group">
+                    <label>Update Status Workflow *</label>
+                    <select id="reviewStatusSelect" required>
+                        <option value="SUBMITTED">SUBMITTED</option>
+                        <option value="UNDER_REVIEW">UNDER REVIEW</option>
+                        <option value="SHORTLISTED">SHORTLISTED</option>
+                        <option value="INTERVIEW_SCHEDULED">INTERVIEW SCHEDULED</option>
+                        <option value="ACCEPTED">ACCEPTED (HIRED)</option>
+                        <option value="REJECTED">REJECTED</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recruiter Feedback / Interview Notes</label>
+                    <textarea id="reviewNoteInput" rows="3" placeholder="e.g. Excellent fit in Spring Cloud. Scheduled technical screening for Friday..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-check-double"></i> Save Review & Notify Candidate</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

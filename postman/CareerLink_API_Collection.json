@@ -1,0 +1,419 @@
+{
+  "info": {
+    "_postman_id": "c71a3998-90f1-4b17-a002-careerlink-ps015",
+    "name": "CareerLink Networks - Enterprise Microservices API Collection",
+    "description": "Comprehensive Postman test collection for PS015 Talent Acquisition Portal covering Auth, Profile, Job, and Application services via Spring Cloud Gateway (Port 8080). Aligned with CO-1 to CO-4.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "candidateId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "recruiterId",
+      "value": "2",
+      "type": "string"
+    },
+    {
+      "key": "jobId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication Service (Port 8081 via Gateway)",
+      "item": [
+        {
+          "name": "Login as Candidate (Auto-saves JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    pm.collectionVariables.set(\"candidateId\", jsonData.id);",
+                  "    console.log(\"Saved JWT token & candidateId!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"candidate@careerlink.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login as Recruiter (Auto-saves JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    pm.collectionVariables.set(\"recruiterId\", jsonData.id);",
+                  "    console.log(\"Saved Recruiter JWT token!\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recruiter@careerlink.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Register New Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Sravani Devi\",\n  \"email\": \"fresh.candidate@gmail.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"CANDIDATE\",\n  \"phoneNumber\": \"+1-555-4433\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Validate JWT Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "validate"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Profile Service (Port 8082 via Gateway)",
+      "item": [
+        {
+          "name": "Get Candidate Profile by User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profiles/{{candidateId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profiles", "{{candidateId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create or Update Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{candidateId}},\n  \"fullName\": \"Alex Morgan\",\n  \"email\": \"candidate@careerlink.com\",\n  \"phone\": \"+1-555-0100\",\n  \"location\": \"San Francisco, CA\",\n  \"headline\": \"Staff Distributed Systems Engineer\",\n  \"summary\": \"Architecting resilient Spring Boot & Kafka microservices.\",\n  \"skills\": [\"Java\", \"Spring Boot\", \"Spring Cloud\", \"Kafka\", \"Docker\", \"Kubernetes\"],\n  \"yearsOfExperience\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profiles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profiles"]
+            }
+          }
+        },
+        {
+          "name": "Talent Search (Recruiter Browse Candidates)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profiles/candidates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profiles", "candidates"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Job Service (Port 8083 via Gateway)",
+      "item": [
+        {
+          "name": "Search Active Job Listings (Public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/jobs?query=Java&employmentType=FULL_TIME",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "jobs"],
+              "query": [
+                { "key": "query", "value": "Java" },
+                { "key": "employmentType", "value": "FULL_TIME" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Job Posting by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/jobs/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "jobs", "{{jobId}}"]
+            }
+          }
+        },
+        {
+          "name": "Post New Job Requisition (Recruiter)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Principal Cloud Platform Engineer\",\n  \"company\": \"TechCorp Global\",\n  \"location\": \"Seattle, WA (Remote)\",\n  \"employmentType\": \"REMOTE\",\n  \"minSalary\": 160000,\n  \"maxSalary\": 210000,\n  \"description\": \"Lead architecture of multi-cloud Kubernetes clusters and microservices pipelines.\",\n  \"requirements\": \"7+ years distributed systems, AWS/GCP, Spring Boot, Terraform.\",\n  \"requiredSkills\": [\"AWS\", \"Kubernetes\", \"Terraform\", \"Java\", \"Spring Cloud\"],\n  \"recruiterId\": {{recruiterId}},\n  \"recruiterEmail\": \"recruiter@careerlink.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "jobs"]
+            }
+          }
+        },
+        {
+          "name": "Get Jobs Posted by Recruiter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/jobs/recruiter/{{recruiterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "jobs", "recruiter", "{{recruiterId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Application Service (Port 8084 via Gateway)",
+      "item": [
+        {
+          "name": "Apply for Job (Candidate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{candidateId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateId\": {{candidateId}},\n  \"candidateName\": \"Alex Morgan\",\n  \"candidateEmail\": \"candidate@careerlink.com\",\n  \"jobId\": 3,\n  \"coverLetter\": \"Excited to apply for the DevOps and SRE role. I have extensive experience with container orchestration and cloud automation.\",\n  \"resumeUrl\": \"https://careerlink.s3.amazonaws.com/resumes/alex_morgan_cv.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/applications/apply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "applications", "apply"]
+            }
+          }
+        },
+        {
+          "name": "Track My Applications (Candidate)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{candidateId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/applications/my-applications?candidateId={{candidateId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "applications", "my-applications"],
+              "query": [
+                { "key": "candidateId", "value": "{{candidateId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "View Applications for Job (Recruiter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/applications/job/{{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "applications", "job", "{{jobId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Application Status & Recruiter Notes (Recruiter)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INTERVIEW_SCHEDULED\",\n  \"recruiterId\": {{recruiterId}},\n  \"recruiterName\": \"Sarah Jenkins\",\n  \"feedbackNote\": \"Completed screening. Scheduled technical interview for Thursday at 3 PM.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/applications/{{applicationId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "applications", "{{applicationId}}", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
