@@ -39,6 +39,11 @@ jobs:
         working-directory: frontend
         run: npm run build -- --base=/SOA-Final-Project/
 
+      # SPA fallback: deep links (e.g. /jobs) serve index.html on GitHub Pages
+      - name: Add SPA 404 fallback
+        working-directory: frontend
+        run: cp dist/index.html dist/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
