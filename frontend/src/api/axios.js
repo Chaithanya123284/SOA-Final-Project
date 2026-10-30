@@ -45,8 +45,9 @@ api.interceptors.response.use(
       if (!isAuthCall) {
         localStorage.removeItem('careerlink_token');
         localStorage.removeItem('careerlink_user');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        const base = import.meta.env.BASE_URL || '/';
+        if (window.location.pathname !== `${base}login`) {
+          window.location.href = `${base}login`;
         }
       }
     }
