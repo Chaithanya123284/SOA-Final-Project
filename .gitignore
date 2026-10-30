@@ -1,0 +1,38 @@
+# ===== Eclipse IDE workspace metadata (never commit) =====
+.metadata/
+
+# ===== Java / Maven build output =====
+backend/**/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ===== IDE / Editor =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+.settings/
+.classpath
+.project
+.factorypath
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Frontend (also covered by frontend/.gitignore) =====
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env.local
+frontend/.env.*.local
+frontend/.vite/
